@@ -5,6 +5,7 @@ LABEL maintainer="Peter Martini <PeterCMartini@GMail.com>, Zak B. Elep <zakame@c
 WORKDIR /usr/src/perl
 
 RUN apt-get update \
+    && apt-get upgrade \
     && apt-get install -y --no-install-recommends \
        bzip2 \
        ca-certificates \
@@ -51,7 +52,8 @@ RUN apt-get update \
     && apt-mark auto '.*' > /dev/null \
     && apt-mark manual $savedPackages \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && rm -fr /var/cache/apt/* /var/lib/apt/lists/* \
+    && apt-get clean \
+    && rm -fr /var/cache/apt/* /var/lib/apt/lists/*
     && rm -fr /root/.cpanm /usr/src/perl /usr/src/App-cpanminus-1.7047* /tmp/* \
     && cpanm --version && cpm --version
 
