@@ -316,7 +316,7 @@ RUN apt-get update \
     && {{docker_slim_run_purge}} \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean \
-    && rm -fr /var/cache/apt/* /var/lib/apt/lists/*
+    && rm -fr /var/cache/apt/* /var/lib/apt/lists/* \
     && rm -fr /root/.cpanm /usr/src/perl /usr/src/{{cpanm_dist_name}}* /tmp/* \
     && cpanm --version && cpm --version
 
