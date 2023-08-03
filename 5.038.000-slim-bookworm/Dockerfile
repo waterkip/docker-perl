@@ -53,7 +53,7 @@ RUN apt-get update \
     && apt-mark manual $savedPackages \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean \
-    && rm -fr /var/cache/apt/* /var/lib/apt/lists/*
+    && rm -fr /var/cache/apt/* /var/lib/apt/lists/* \
     && rm -fr /root/.cpanm /usr/src/perl /usr/src/App-cpanminus-1.7047* /tmp/* \
     && cpanm --version && cpm --version
 
