@@ -36,8 +36,7 @@ EOF
 }
 
 my $docker_slim_run_install = <<'EOF';
-apt-get update \
-    && apt-get install -y --no-install-recommends \
+apt-get install -y --no-install-recommends \
        bzip2 \
        ca-certificates \
        # cpio \
@@ -64,9 +63,7 @@ chomp $docker_slim_run_install;
 my $docker_slim_run_purge = <<'EOF';
 savedPackages="ca-certificates make netbase zlib1g-dev libssl-dev" \
     && apt-mark auto '.*' > /dev/null \
-    && apt-mark manual $savedPackages \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && rm -fr /var/cache/apt/* /var/lib/apt/lists/*
+    && apt-mark manual $savedPackages
 EOF
 chomp $docker_slim_run_purge;
 
@@ -292,7 +289,9 @@ LABEL maintainer="Peter Martini <PeterCMartini@GMail.com>, Zak B. Elep <zakame@c
 {{docker_copy_perl_patch}}
 WORKDIR /usr/src/perl
 
-RUN {{docker_slim_run_install}} \
+RUN apt-get update \
+    && apt-get upgrade \
+    && {{docker_slim_run_install}} \
     && curl -fL {{url}} -o perl-{{version}}.tar.{{type}} \
     && echo '{{sha256}} *perl-{{version}}.tar.{{type}}' | sha256sum --strict --check - \
     && tar --strip-components=1 -xaf perl-{{version}}.tar.{{type}} -C /usr/src/perl \
@@ -315,6 +314,9 @@ RUN {{docker_slim_run_install}} \
     && echo '{{cpm_dist_sha256}} */usr/local/bin/cpm' | sha256sum --strict --check - \
     && chmod +x /usr/local/bin/cpm \
     && {{docker_slim_run_purge}} \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && apt-get clean \
+    && rm -fr /var/cache/apt/* /var/lib/apt/lists/*
     && rm -fr /root/.cpanm /usr/src/perl /usr/src/{{cpanm_dist_name}}* /tmp/* \
     && cpanm --version && cpm --version
 
