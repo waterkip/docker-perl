@@ -149,25 +149,29 @@ for my $release (@{$config->{releases}}) {
     print "Downloading $url\n";
     getstore($url, "$downloads/$file");
   }
-  {
-    my $dir = "$downloads/perl-$release->{version}";
-    qx{rm -fR $dir};
-    mkdir $dir or die "Couldn't create $dir";
-    qx{
-      tar -C "$downloads" -xf $dir.tar.gz &&\
-      cd $dir &&\
-      chown -R \$(id -u):\$(id -g) . &&\
-      git init &&\
-      git add . &&\
-      git commit -m tmp
-    };
-    die "Couldn't create a temp git repo for $release->{version}" if $? != 0;
-    Devel::PatchPerl->patch_source($release->{version}, $dir);
-    $patch = qx{
-      cd $dir && git -c 'diff.mnemonicprefix=false' diff
-    };
-    die "Couldn't create a Devel::PatchPerl patch for $release->{version}" if $? != 0;
-  }
+  # {
+  #   use File::Copy 'move';
+  #   my $dir = "$downloads/perl-$release->{version}";
+  #   move($dir, "$dir.bk");
+  #   say "Creating dir";
+  #   mkdir $dir or die "Couldn't create $dir";
+  #   system(qw(tar -C ), "$downloads", qw(--no-same-owner
+  #       --no-same-permission --numeric-owner --delay-directory-restore
+  #       -I pigz -xf), "$dir.tar.gz");
+  #   qx{
+  #     cd $dir &&\
+  #     git init &&\
+  #     git add . &&\
+  #     git commit -m tmp
+  #   };
+  #   warn "Creating patches";
+  #   die "Couldn't create a temp git repo for $release->{version}" if $? != 0;
+  #   Devel::PatchPerl->patch_source($release->{version}, $dir);
+  #   $patch = qx{
+  #     cd $dir && git -c 'diff.mnemonicprefix=false' diff
+  #   };
+  #   die "Couldn't create a Devel::PatchPerl patch for $release->{version}" if $? != 0;
+  # }
 
   for my $build (keys %builds) {
     $release->{url} = $url;
